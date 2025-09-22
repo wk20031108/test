@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>零信任远程办公安全系统 - 生物医药行业</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --gray-color: #7f8c8d;
+            --biomed-color: #9b59b6;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            background: rgba(155, 89, 182, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        .problem-statement {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            color: var(--biomed-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+        
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .status-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        select, button, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        select:focus, input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        button {
+            background: var(--biomed-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        button:hover {
+            background: #8e44ad;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-panel {
+            text-align: center;
+        }
+        
+        .score-display {
+            font-size: 4rem;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+        
+        .decision-allowed {
+            color: var(--success-color);
+        }
+        
+        .decision-denied {
+            color: var(--danger-color);
+        }
+        
+        .decision-mfa {
+            color: var(--warning-color);
+        }
+        
+        .details-list {
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .detail-item {
+            background: var(--light-color);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .positive {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+        
+        .negative {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+        
+        .scenario-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .scenario-button {
+            background: var(--dark-color);
+        }
+        
+        .scenario-button.normal {
+            background: var(--success-color);
+        }
+        
+        .scenario-button.suspicious {
+            background: var(--warning-color);
+        }
+        
+        .scenario-button.malicious {
+            background: var(--danger-color);
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .status-indicators {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--light-color);
+            border-radius: 8px;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-good {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .status-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .status-bad {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .data-flow {
+            margin-top: 20px;
+        }
+        
+        .flow-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: var(--light-color);
+            border-radius: 8px;
+        }
+        
+        .flow-icon {
+            margin-right: 10px;
+            width: 30px;
+            text-align: center;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+        
+        .user-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light-color);
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .scenario-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .highlight {
+            background-color: #fffacd;
+            transition: background-color 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>零信任远程办公安全系统</h1>
+            <p class="subtitle">生物医药行业研发数据保护解决方案</p>
+            <div class="problem-statement">
+                <p>本系统针对生物医药行业远程办公安全痛点，解决：</p>
+                <ul>
+                    <li>细粒度访问控制 - 防止离职人员访问敏感数据</li>
+                    <li>终端安全状态实时验证 - 确保设备符合安全标准</li>
+                    <li>数据流动监测 - 检测并防止异常数据外发行为</li>
+                </ul>
+            </div>
+        </header>
+        
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-user"></i>用户身份验证
+            </div>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <select id="username">
+                        <option value="">-- 请选择用户 --</option>
+                        <option value="researcher">张研究员 (现任员工)</option>
+                        <option value="manager">王经理 (项目负责人)</option>
+                        <option value="former">李前员工 (已离职)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" placeholder="请输入密码">
+                </div>
+                <div class="form-group">
+                    <label for="mfa">双因素认证</label>
+                    <input type="text" id="mfa" placeholder="请输入验证码 (演示: 任意输入)">
+                </div>
+                <button id="login-btn">登录系统</button>
+            </div>
+        </div>
+        
+        <div id="main-system" style="display: none;">
+            <div class="user-info">
+                <h3 id="current-user">当前用户: </h3>
+                <button id="logout-btn">切换用户</button>
+            </div>
+            
+            <div class="dashboard">
+                <div class="main-panel">
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-laptop"></i>环境与设备状态
+                        </div>
+                        <div class="form-group">
+                            <label for="device">设备类型</label>
+                            <select id="device">
+                                <option value="company-pc">公司电脑 (已安装安全软件)</option>
+                                <option value="personal-pc">个人电脑 (部分安全措施)</option>
+                                <option value="unmanaged">未管理设备 (无安全软件)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="network">网络环境</label>
+                            <select id="network">
+                                <option value="company-network">公司内网 (安全)</option>
+                                <option value="home-wifi">家庭Wi-Fi (一般)</option>
+                                <option value="public-wifi">公共Wi-Fi (高风险)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="location">地理位置</label>
+                            <select id="location">
+                                <option value="usual-location">常见城市 (北京)</option>
+                                <option value="unusual-location">异常地区 (国外)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-shield-alt"></i>数据访问请求
+                        </div>
+                        <div class="form-group">
+                            <label for="resource">访问资源</label>
+                            <select id="resource">
+                                <option value="public">公开研究资料 (低敏感度)</option>
+                                <option value="project-a">项目A实验数据 (中敏感度)</option>
+                                <option value="project-b">项目B临床试验数据 (高敏感度)</option>
+                                <option value="financial">财务数据 (极高敏感度)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="action">操作类型</label>
+                            <select id="action">
+                                <option value="view">查看</option>
+                                <option value="download">下载</option>
+                                <option value="share">分享</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button id="evaluate-btn" class="pulse">评估访问权限</button>
+                        </div>
+                        
+                        <div class="scenario-buttons">
+                            <button class="scenario-button normal" data-scenario="normal">
+                                正常研发场景
+                            </button>
+                            <button class="scenario-button suspicious" data-scenario="suspicious">
+                                可疑访问场景
+                            </button>
+                            <button class="scenario-button malicious" data-scenario="malicious">
+                                恶意数据窃取
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card result-panel">
+                        <div class="card-title">
+                            <i class="fas fa-chart-bar"></i>访问决策结果
+                        </div>
+                        
+                        <div id="decision-result">
+                            <p>请先设置环境参数并点击"评估访问权限"</p>
+                        </div>
+                        
+                        <div id="score-display" class="score-display" style="display: none;">
+                            <span id="score-value">0</span> 分
+                        </div>
+                        
+                        <div id="details-list" class="details-list" style="display: none;">
+                            <h3>决策依据明细</h3>
+                            <div id="details-container"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="status-panel">
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-heartbeat"></i>安全状态监控
+                        </div>
+                        <div class="status-indicators">
+                            <div class="status-item">
+                                <span>设备健康状态</span>
+                                <span id="device-status" class="status-badge status-good">良好</span>
+                            </div>
+                            <div class="status-item">
+                                <span>网络安全性</span>
+                                <span id="network-status" class="status-badge status-good">安全</span>
+                            </div>
+                            <div class="status-item">
+                                <span>用户行为分析</span>
+                                <span id="behavior-status" class="status-badge status-good">正常</span>
+                            </div>
+                            <div class="status-item">
+                                <span>数据流监控</span>
+                                <span id="dataflow-status" class="status-badge status-good">正常</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-project-diagram"></i>数据流动监测
+                        </div>
+                        <div class="data-flow">
+                            <div class="flow-item">
+                                <div class="flow-icon"><i class="fas fa-database"></i></div>
+                                <div>实验数据访问请求</div>
+                            </div>
+                            <div class="flow-item">
+                                <div class="flow-icon"><i class="fas fa-check-circle"></i></div>
+                                <div>权限验证通过</div>
+                            </div>
+                            <div class="flow-item">
+                                <div class="flow-icon"><i class="fas fa-shield-alt"></i></div>
+                                <div>数据加密传输</div>
+                            </div>
+                            <div class="flow-item">
+                                <div class="flow-icon"><i class="fas fa-history"></i></div>
+                                <div>操作日志记录</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-user-clock"></i>员工状态验证
+                        </div>
+                        <div class="status-indicators">
+                            <div class="status-item">
+                                <span>当前用户状态</span>
+                                <span id="user-status" class="status-badge status-good">在职</span>
+                            </div>
+                            <div class="status-item">
+                                <span>项目权限</span>
+                                <span id="project-access" class="status-badge status-good">有效</span>
+                            </div>
+                            <div class="status-item">
+                                <span>访问时间</span>
+                                <span id="access-time" class="status-badge status-good">工作时间</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>零信任远程办公安全系统 - 生物医药行业解决方案原型</p>
+        </footer>
+    </div>
+
+    <script>
+        // 全局变量存储当前用户信息
+        let currentUser = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const mainSystem = document.getElementById('main-system');
+            const evaluateBtn = document.getElementById('evaluate-btn');
+            const decisionResult = document.getElementById('decision-result');
+            const scoreDisplay = document.getElementById('score-display');
+            const scoreValue = document.getElementById('score-value');
+            const detailsList = document.getElementById('details-list');
+            const detailsContainer = document.getElementById('details-container');
+            const scenarioButtons = document.querySelectorAll('.scenario-button');
+            const currentUserElement = document.getElementById('current-user');
+            
+            // 状态指示器
+            const deviceStatus = document.getElementById('device-status');
+            const networkStatus = document.getElementById('network-status');
+            const behaviorStatus = document.getElementById('behavior-status');
+            const dataflowStatus = document.getElementById('dataflow-status');
+            const userStatus = document.getElementById('user-status');
+            const projectAccess = document.getElementById('project-access');
+            const accessTime = document.getElementById('access-time');
+            
+            // 用户数据
+            const users = {
+                'researcher': {
+                    name: '张研究员',
+                    status: '在职',
+                    projects: ['project-a', 'public']
+                },
+                'manager': {
+                    name: '王经理',
+                    status: '在职',
+                    projects: ['project-a', 'project-b', 'public', 'financial']
+                },
+                'former': {
+                    name: '李前员工',
+                    status: '离职',
+                    projects: [] // 无项目权限
+                }
+            };
+            
+            // 登录功能
+            loginBtn.addEventListener('click', function() {
+                const username = document.getElementById('username').value;
+                if (!username) {
+                    alert('请选择用户');
+                    return;
+                }
+                
+                const mfaCode = document.getElementById('mfa').value;
+                if (!mfaCode) {
+                    alert('请输入双因素认证代码');
+                    return;
+                }
+                
+                // 存储当前用户信息
+                currentUser = username;
+                
+                // 显示主系统
+                mainSystem.style.display = 'block';
+                
+                // 更新用户信息显示
+                currentUserElement.textContent = `当前用户: ${users[username].name}`;
+                
+                // 更新用户状态显示
+                updateUserStatus(username);
+            });
+            
+            // 退出登录功能
+            logoutBtn.addEventListener('click', function() {
+                // 重置当前用户
+                currentUser = null;
+                
+                // 隐藏主系统
+                mainSystem.style.display = 'none';
+                
+                // 重置表单
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('mfa').value = '';
+            });
+            
+            // 更新用户状态显示
+            function updateUserStatus(username) {
+                const user = users[username];
+                userStatus.textContent = user.status;
+                userStatus.className = user.status === '在职' ? 
+                    'status-badge status-good' : 'status-badge status-bad';
+                
+                projectAccess.textContent = user.projects.length > 0 ? '有效' : '无权限';
+                projectAccess.className = user.projects.length > 0 ? 
+                    'status-badge status-good' : 'status-badge status-bad';
+            }
+            
+            // 评估访问权限
+            evaluateBtn.addEventListener('click', function() {
+                // 添加点击动画效果
+                this.classList.remove('pulse');
+                void this.offsetWidth; // 触发重绘
+                this.classList.add('pulse');
+                
+                evaluateAccess();
+            });
+            
+            // 场景按钮
+            scenarioButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const scenario = this.dataset.scenario;
+                    loadScenario(scenario);
+                });
+            });
+            
+            // 评估访问权限函数
+            function evaluateAccess() {
+                if (!currentUser) {
+                    alert('请先登录系统');
+                    return;
+                }
+                
+                // 获取当前环境参数
+                const device = document.getElementById('device').value;
+                const network = document.getElementById('network').value;
+                const location = document.getElementById('location').value;
+                const resource = document.getElementById('resource').value;
+                const action = document.getElementById('action').value;
+                
+                const user = users[currentUser];
+                
+                // 计算信任分数
+                let score = 50; // 基础分数
+                let details = [];
+                
+                // 1. 用户状态验证 (解决离职人员访问问题)
+                if (user.status === '离职') {
+                    score -= 100;
+                    details.push({ factor: '用户状态', score: -100, reason: '离职员工，无任何访问权限' });
+                } else {
+                    score += 10;
+                    details.push({ factor: '用户状态', score: 10, reason: '在职员工' });
+                }
+                
+                // 2. 项目权限验证 (细粒度访问控制)
+                if (!user.projects.includes(resource)) {
+                    score -= 50;
+                    details.push({ factor: '项目权限', score: -50, reason: '无此项目访问权限' });
+                } else {
+                    score += 20;
+                    details.push({ factor: '项目权限', score: 20, reason: '拥有此项目访问权限' });
+                }
+                
+                // 3. 设备类型评分 (终端安全状态验证)
+                if (device === 'company-pc') {
+                    score += 30;
+                    details.push({ factor: '设备安全状态', score: 30, reason: '公司设备，已安装安全软件' });
+                    deviceStatus.textContent = '良好';
+                    deviceStatus.className = 'status-badge status-good';
+                } else if (device === 'personal-pc') {
+                    score -= 10;
+                    details.push({ factor: '设备安全状态', score: -10, reason: '个人设备，安全措施不足' });
+                    deviceStatus.textContent = '警告';
+                    deviceStatus.className = 'status-badge status-warning';
+                } else {
+                    score -= 30;
+                    details.push({ factor: '设备安全状态', score: -30, reason: '未管理设备，高风险' });
+                    deviceStatus.textContent = '危险';
+                    deviceStatus.className = 'status-badge status-bad';
+                }
+                
+                // 4. 网络环境评分
+                if (network === 'company-network') {
+                    score += 25;
+                    details.push({ factor: '网络环境', score: 25, reason: '受保护的公司内网' });
+                    networkStatus.textContent = '安全';
+                    networkStatus.className = 'status-badge status-good';
+                } else if (network === 'home-wifi') {
+                    score += 5;
+                    details.push({ factor: '网络环境', score: 5, reason: '家庭Wi-Fi，相对安全' });
+                    networkStatus.textContent = '一般';
+                    networkStatus.className = 'status-badge status-warning';
+                } else {
+                    score -= 25;
+                    details.push({ factor: '网络环境', score: -25, reason: '公共Wi-Fi，高风险环境' });
+                    networkStatus.textContent = '危险';
+                    networkStatus.className = 'status-badge status-bad';
+                }
+                
+                // 5. 地理位置评分
+                if (location === 'usual-location') {
+                    score += 15;
+                    details.push({ factor: '地理位置', score: 15, reason: '常见登录地点' });
+                } else {
+                    score -= 30;
+                    details.push({ factor: '地理位置', score: -30, reason: '异常登录地点' });
+                }
+                
+                // 6. 操作类型风险评估 (数据流动监测)
+                if (action === 'download' && resource !== 'public') {
+                    score -= 20;
+                    details.push({ factor: '操作风险', score: -20, reason: '下载敏感数据需额外审批' });
+                    dataflowStatus.textContent = '监控中';
+                    dataflowStatus.className = 'status-badge status-warning';
+                } else if (action === 'share') {
+                    score -= 40;
+                    details.push({ factor: '操作风险', score: -40, reason: '分享敏感数据被禁止' });
+                    dataflowStatus.textContent = '警告';
+                    dataflowStatus.className = 'status-badge status-bad';
+                } else {
+                    details.push({ factor: '操作风险', score: 0, reason: '操作风险低' });
+                    dataflowStatus.textContent = '正常';
+                    dataflowStatus.className = 'status-badge status-good';
+                }
+                
+                // 确保分数在0-100范围内
+                score = Math.max(0, Math.min(100, score));
+                
+                // 根据资源和分数做出决策
+                let decision;
+                let decisionReason = "";
+                
+                // 首先检查用户状态和权限
+                if (user.status === '离职') {
+                    decision = 'DENY';
+                    decisionReason = "离职员工无访问权限";
+                } else if (!user.projects.includes(resource)) {
+                    decision = 'DENY';
+                    decisionReason = "无此项目访问权限";
+                } else if (resource === 'financial' && score < 85) {
+                    decision = 'DENY';
+                    decisionReason = "财务数据需要更高安全等级";
+                } else if (resource === 'project-b' && score < 70) {
+                    decision = 'MFA';
+                    decisionReason = "临床试验数据需要额外验证";
+                } else if (resource === 'project-a' && score < 50) {
+                    decision = 'MFA';
+                    decisionReason = "实验数据需要额外验证";
+                } else if (score >= 70) {
+                    decision = 'ALLOW';
+                    decisionReason = "信任分数足够高";
+                } else if (score >= 50) {
+                    decision = 'MFA';
+                    decisionReason = "需要二次认证";
+                } else {
+                    decision = 'DENY';
+                    decisionReason = "信任分数过低";
+                }
+                
+                // 行为分析
+                if (action === 'share' && decision === 'ALLOW') {
+                    decision = 'DENY';
+                    decisionReason = "禁止分享敏感数据";
+                    behaviorStatus.textContent = '异常';
+                    behaviorStatus.className = 'status-badge status-bad';
+                } else {
+                    behaviorStatus.textContent = '正常';
+                    behaviorStatus.className = 'status-badge status-good';
+                }
+                
+                // 显示结果
+                displayResult(decision, score, details, resource, decisionReason);
+            }
+            
+            // 显示结果函数
+            function displayResult(decision, score, details, resource, reason) {
+                // 显示决策结果
+                let decisionText, decisionClass;
+                if (decision === 'ALLOW') {
+                    decisionText = '允许访问';
+                    decisionClass = 'decision-allowed';
+                } else if (decision === 'DENY') {
+                    decisionText = '拒绝访问';
+                    decisionClass = 'decision-denied';
+                } else {
+                    decisionText = '需要二次认证';
+                    decisionClass = 'decision-mfa';
+                }
+                
+                decisionResult.innerHTML = `
+                    <h2 class="${decisionClass}">${decisionText}</h2>
+                    <p>${reason}</p>
+                    <p>访问资源: <strong>${document.getElementById('resource').options[document.getElementById('resource').selectedIndex].text}</strong></p>
+                `;
+                
+                // 显示分数
+                scoreValue.textContent = score;
+                scoreDisplay.style.display = 'block';
+                
+                // 设置分数颜色
+                if (score >= 70) {
+                    scoreValue.className = 'decision-allowed';
+                } else if (score >= 50) {
+                    scoreValue.className = 'decision-mfa';
+                } else {
+                    scoreValue.className = 'decision-denied';
+                }
+                
+                // 显示决策明细
+                detailsContainer.innerHTML = '';
+                details.forEach(detail => {
+                    const detailItem = document.createElement('div');
+                    detailItem.className = 'detail-item';
+                    
+                    const scoreClass = detail.score > 0 ? 'positive' : 'negative';
+                    
+                    detailItem.innerHTML = `
+                        <div>${detail.factor}: ${detail.reason}</div>
+                        <div class="${scoreClass}">${detail.score > 0 ? '+' + detail.score : detail.score}分</div>
+                    `;
+                    
+                    // 添加高亮动画
+                    detailItem.classList.add('highlight');
+                    setTimeout(() => {
+                        detailItem.classList.remove('highlight');
+                    }, 1000);
+                    
+                    detailsContainer.appendChild(detailItem);
+                });
+                
+                detailsList.style.display = 'block';
+            }
+            
+            // 加载预设场景
+            function loadScenario(scenario) {
+                if (!currentUser) {
+                    alert('请先登录系统');
+                    return;
+                }
+                
+                if (scenario === 'normal') {
+                    // 正常研发场景
+                    document.getElementById('device').value = 'company-pc';
+                    document.getElementById('network').value = 'company-network';
+                    document.getElementById('location').value = 'usual-location';
+                    document.getElementById('resource').value = 'project-a';
+                    document.getElementById('action').value = 'view';
+                } else if (scenario === 'suspicious') {
+                    // 可疑访问场景
+                    document.getElementById('device').value = 'personal-pc';
+                    document.getElementById('network').value = 'home-wifi';
+                    document.getElementById('location').value = 'usual-location';
+                    document.getElementById('resource').value = 'project-b';
+                    document.getElementById('action').value = 'download';
+                } else {
+                    // 恶意数据窃取场景
+                    if (currentUser === 'former') {
+                        document.getElementById('device').value = 'unmanaged';
+                        document.getElementById('network').value = 'public-wifi';
+                        document.getElementById('location').value = 'unusual-location';
+                        document.getElementById('resource').value = 'project-b';
+                        document.getElementById('action').value = 'download';
+                    } else {
+                        // 如果是现任员工尝试恶意操作
+                        document.getElementById('device').value = 'personal-pc';
+                        document.getElementById('network').value = 'public-wifi';
+                        document.getElementById('location').value = 'unusual-location';
+                        document.getElementById('resource').value = 'financial';
+                        document.getElementById('action').value = 'share';
+                    }
+                }
+                
+                // 自动评估
+                evaluateAccess();
+            }
+        });
+    </script>
+</body>
+</html>
